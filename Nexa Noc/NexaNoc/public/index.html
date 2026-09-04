@@ -1,0 +1,787 @@
+<!--
+===============================================================================
+NOC FLOW STUDIO - GUIA RÁPIDO DO HTML
+===============================================================================
+
+HTML = ESTRUTURA da aplicação.
+
+Uma forma simples de lembrar:
+  HTML       -> o que existe na tela
+  CSS        -> como isso aparece
+  JavaScript -> o que acontece quando o usuário interage
+  Python     -> o que acontece no servidor/backend
+
+IMPORTANTE PARA APRENDER:
+- class="..." normalmente é usada pelo CSS para estilizar vários elementos.
+- id="..." identifica um elemento único e é muito usado pelo JavaScript.
+- data-* guarda pequenas informações no próprio HTML.
+  Exemplo:
+      data-section="dashboard"
+  O JavaScript lê esse valor para descobrir qual tela deve abrir.
+
+Se você renomear um ID aqui, procure o mesmo ID em script.js.
+Exemplo:
+  id="generateTicketBtn"
+  JavaScript:
+  $("#generateTicketBtn").addEventListener(...)
+
+===============================================================================
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOC Analise de Redes </title>
+  <meta name="description" content="Ferramenta web moderna para apoio operacional de NOC">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!--
+    LAYOUT PRINCIPAL
+    .app possui duas grandes colunas:
+    1) sidebar = menu lateral
+    2) content = conteúdo da tela selecionada
+
+    Esse layout é criado no CSS com display: grid.
+  -->
+  <div class="app">
+
+    <!-- MENU LATERAL: os botões usam data-section para navegar sem recarregar a página. -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">NC</div>
+        <div>
+          <h1>NOC</h1>
+          <p>Operação com clareza</p>
+        </div>
+      </div>
+
+      <!--
+      NAVEGAÇÃO PRINCIPAL
+      O atributo data-section deve ter o mesmo nome do id da <section>.
+      Exemplo:
+        botão:  data-section="comandos"
+        seção:   id="comandos"
+      -->
+      <nav class="sidebar-nav">
+        <button class="nav-link active" data-section="dashboard">Dashboard</button>
+        <button class="nav-link" data-section="chamados">Chamados</button>
+        <button class="nav-link" data-section="modelos">Modelos</button>
+        <button class="nav-link" data-section="comandos">Comandos</button>
+        <button class="nav-link" data-section="parser">Parser de Incidentes</button>
+        <button class="nav-link" data-section="ia">Assistente IA</button>
+        <button class="nav-link" data-section="referencias">Referências</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="ghost-btn full" id="exportDataBtn">Exportar dados</button>
+        <button class="ghost-btn full" id="importDataBtn">Importar dados</button>
+        <input type="file" id="importFile" accept=".json" hidden>
+      </div>
+    </aside>
+
+    <div class="content">
+      <!--
+      BARRA SUPERIOR
+      Contém:
+      - título da página atual
+      - busca global
+      - troca de tema
+      - perfil
+      - download do projeto
+      -->
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Sua central de apoio para operação NOC.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="search-global">
+            <input type="search" id="globalCommandSearch" placeholder="Pesquisar comandos, modelos ou referências...">
+          </div>
+
+          <button class="topbar-tool-btn" id="appearanceBtn" type="button" title="Personalizar aparência">
+            <span class="tool-icon">◐</span>
+            <span>Aparência</span>
+          </button>
+
+          <button class="profile-trigger" id="profileBtn" type="button" title="Editar perfil">
+            <span class="profile-avatar small" id="profileAvatarTop">👩‍💻</span>
+            <span class="profile-trigger-text">
+              <strong id="profileNameTop">Operador NOC</strong>
+              <small id="profileRoleTop">NOC</small>
+            </span>
+          </button>
+
+          <button class="primary-btn" id="downloadFrontendBtn">Baixar projeto</button>
+        </div>
+      </header>
+
+      <main>
+        <!--
+        =======================================================================
+        MÓDULO: DASHBOARD
+        =======================================================================
+        Tela inicial. Mostra indicadores, notas do turno e atalhos.
+        Os números dos cards são atualizados por renderStats() em script.js.
+        As notas usam localStorage para permanecerem salvas no navegador.
+        -->
+        <section class="section active" id="dashboard">
+          <div class="hero-card">
+            <div>
+              <span class="eyebrow">FOCO DO TURNO</span>
+              <h3>Menos ruído, mais produtividade</h3>
+              <p>Uma ferramenta pensada para abrir chamados, gerar mensagens, consultar comandos, resumir incidentes e acelerar seu dia a dia no NOC.</p>
+            </div>
+            <div class="hero-actions">
+              <button class="primary-btn quick-nav" data-target="chamados">Abrir chamado</button>
+              <button class="secondary-btn quick-nav" data-target="parser">Analisar incidente</button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span class="stat-label">Chamados gerados</span>
+              <strong id="statCalls">0</strong>
+              <small>neste navegador</small>
+            </article>
+
+            <article class="stat-card">
+              <span class="stat-label">RFOs gerados</span>
+              <strong id="statRfo">0</strong>
+              <small>neste navegador</small>
+            </article>
+
+            <article class="stat-card">
+              <span class="stat-label">Mensagens copiadas</span>
+              <strong id="statMessages">0</strong>
+              <small>produtividade local</small>
+            </article>
+
+            <article class="stat-card">
+              <span class="stat-label">Favoritos</span>
+              <strong id="statFavorites">0</strong>
+              <small>comandos salvos</small>
+            </article>
+          </div>
+
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Notas do turno</h3>
+                  <p>Anotações salvas automaticamente</p>
+                </div>
+                <span class="pill" id="notesStatus">salvo</span>
+              </div>
+              <textarea id="shiftNotes" class="textarea large" placeholder="Registre observações do turno, pendências, retornos, horários, evidências..."></textarea>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Ações rápidas</h3>
+                  <p>Navegue direto para o que mais usa</p>
+                </div>
+              </div>
+
+              <div class="quick-actions-grid">
+                <button class="action-tile quick-nav" data-target="chamados">Novo chamado</button>
+                <button class="action-tile quick-nav" data-target="modelos">Mensagens</button>
+                <button class="action-tile quick-nav" data-target="comandos">Comandos</button>
+                <button class="action-tile quick-nav" data-target="parser">Parser</button>
+                <button class="action-tile quick-nav" data-target="ia">Assistente IA</button>
+                <button class="action-tile quick-nav" data-target="referencias">Referências</button>
+              </div>
+
+              <div class="mini-callout">
+                <strong>Diferencial desta versão:</strong>
+                visual limpo, foco em fluxo de trabalho, sem copiar a estrutura do sistema do colaborador.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: CHAMADOS
+        =======================================================================
+        O formulário coleta dados uma única vez.
+        generateTicketOutputs() usa esses campos para montar:
+        - texto técnico
+        - mensagem ao cliente
+        - RFO
+
+        Dica de estudo:
+        procure por "generateTicketOutputs" no script.js.
+        -->
+        <section class="section" id="chamados">
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Gerador de chamado</h3>
+                  <p>Preencha uma vez e gere múltiplas saídas</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <label>
+                  Solicitante
+                  <input class="input" id="ticketRequester" type="text" placeholder="Nome do solicitante">
+                </label>
+
+                <label>
+                  Designação
+                  <input class="input" id="ticketDesignation" type="text" placeholder="Ex.: Link dedicado">
+                </label>
+
+                <label>
+                  Cliente final
+                  <input class="input" id="ticketClient" type="text" placeholder="Nome do cliente final">
+                </label>
+
+                <label>
+                  Host / circuito
+                  <input class="input" id="ticketHost" type="text" placeholder="Ex.: SW-025-PA_PRB">
+                </label>
+
+                <label>
+                  Falha
+                  <input class="input" id="ticketFailure" type="text" placeholder="Ex.: indisponibilidade total">
+                </label>
+
+                <label>
+                  Início da falha
+                  <input class="input" id="ticketStart" type="datetime-local">
+                </label>
+
+                <label>
+                  Triagem interna
+                  <select class="input" id="ticketTriage">
+                    <option value="">Selecione</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
+
+                <label>
+                  Telefone / e-mail
+                  <input class="input" id="ticketContact" type="text" placeholder="Contato do cliente">
+                </label>
+              </div>
+
+              <label class="full-block">
+                Observação
+                <textarea class="textarea" id="ticketObs" placeholder="Detalhes adicionais"></textarea>
+              </label>
+
+              <div class="button-row">
+                <button class="primary-btn" id="generateTicketBtn">Gerar saída</button>
+                <button class="secondary-btn" id="clearTicketBtn">Limpar</button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Saídas geradas</h3>
+                  <p>Copie conforme a necessidade</p>
+                </div>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>Texto técnico / GLPI</strong>
+                  <button class="ghost-btn copy-output" data-output="ticketOutputTechnical">Copiar</button>
+                </div>
+                <textarea id="ticketOutputTechnical" class="textarea output" readonly></textarea>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>Mensagem ao cliente</strong>
+                  <button class="ghost-btn copy-output" data-output="ticketOutputClient">Copiar</button>
+                </div>
+                <textarea id="ticketOutputClient" class="textarea output" readonly></textarea>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>RFO</strong>
+                  <button class="ghost-btn copy-output" data-output="ticketOutputRfo">Copiar</button>
+                </div>
+                <textarea id="ticketOutputRfo" class="textarea output" readonly></textarea>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: MODELOS
+        =======================================================================
+        Os cards desta tela NÃO estão escritos manualmente no HTML.
+        Eles são criados dinamicamente pelo JavaScript a partir do array
+        "templates" e dos modelos personalizados salvos no navegador.
+        -->
+        <section class="section" id="modelos">
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Biblioteca de modelos</h3>
+                  <p>Filtre por categoria e copie rapidamente</p>
+                </div>
+              </div>
+
+              <div class="form-grid compact">
+                <label>
+                  Categoria
+                  <select class="input" id="templateCategory"></select>
+                </label>
+                <label>
+                  Buscar
+                  <input class="input" id="templateSearch" type="search" placeholder="Ex.: normalização">
+                </label>
+              </div>
+
+              <div id="templateList" class="list-stack"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Modelo selecionado</h3>
+                  <p>Edite se quiser antes de copiar</p>
+                </div>
+              </div>
+
+              <input class="input" id="templateTitle" type="text" placeholder="Título do modelo">
+              <textarea class="textarea output tall" id="templateContent" placeholder="Selecione um modelo ou escreva o seu"></textarea>
+
+              <div class="button-row">
+                <button class="primary-btn" id="copyTemplateBtn">Copiar modelo</button>
+                <button class="secondary-btn" id="saveCustomTemplateBtn">Salvar como modelo local</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: COMANDOS
+        =======================================================================
+        A lista de comandos também é criada pelo JavaScript.
+        Para adicionar um comando novo, normalmente você altera o array
+        "commands" em script.js, sem precisar criar novos cards aqui.
+        -->
+        <section class="section" id="comandos">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Base de comandos</h3>
+                <p>Pesquise por fabricante, categoria ou descrição</p>
+              </div>
+            </div>
+
+            <div class="toolbar-grid">
+              <label>
+                Fabricante
+                <select class="input" id="vendorFilter"></select>
+              </label>
+              <label>
+                Categoria
+                <select class="input" id="commandCategoryFilter"></select>
+              </label>
+              <label class="wide">
+                Busca
+                <input class="input" id="commandSearch" type="search" placeholder="Ex.: ntp, vlan, interface, bgp...">
+              </label>
+            </div>
+
+            <div id="commandsList" class="command-list"></div>
+          </article>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: PARSER DE INCIDENTES
+        =======================================================================
+        O usuário cola um texto bruto.
+        O JavaScript procura padrões como:
+        host, interface, IP, horário, duração e estado.
+        Depois gera um resumo estruturado.
+        -->
+        <section class="section" id="parser">
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Parser de incidentes</h3>
+                  <p>Cole o texto de alerta, logs, Zabbix ou anotações</p>
+                </div>
+              </div>
+
+              <textarea class="textarea tall" id="incidentInput" placeholder="Cole aqui o texto do incidente..."></textarea>
+
+              <div class="button-row">
+                <button class="primary-btn" id="parseIncidentBtn">Analisar</button>
+                <button class="secondary-btn" id="clearIncidentBtn">Limpar</button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Resultado estruturado</h3>
+                  <p>Resumo automático para agilizar o tratamento</p>
+                </div>
+              </div>
+
+              <div class="result-box">
+                <h4>Campos identificados</h4>
+                <div id="incidentChips" class="chips"></div>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>Resumo técnico</strong>
+                  <button class="ghost-btn" id="copyIncidentSummaryBtn">Copiar</button>
+                </div>
+                <textarea id="incidentSummaryOutput" class="textarea output tall" readonly></textarea>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: ASSISTENTE IA
+        =======================================================================
+        O navegador envia uma requisição HTTP POST para:
+            /api/ai-assist
+
+        Essa rota é implementada em app.py (Flask).
+        Atualmente existe um assistente local baseado em regras.
+        A arquitetura ficou pronta para uma integração de IA futura.
+        -->
+        <section class="section" id="ia">
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Assistente IA</h3>
+                  <p>Use prompts prontos ou conecte com o backend Python</p>
+                </div>
+              </div>
+
+              <label>
+                Objetivo
+                <select class="input" id="aiTask">
+                  <option value="technical_summary">Resumo técnico</option>
+                  <option value="customer_update">Atualização para cliente</option>
+                  <option value="rfo">Gerar RFO</option>
+                  <option value="next_steps">Próximos passos</option>
+                </select>
+              </label>
+
+              <label class="full-block">
+                Contexto
+                <textarea class="textarea tall" id="aiContext" placeholder="Cole o contexto técnico aqui..."></textarea>
+              </label>
+
+              <div class="button-row">
+                <button class="primary-btn" id="generateAiPromptBtn">Gerar prompt</button>
+                <button class="secondary-btn" id="runAiBtn">Executar pelo backend</button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Saída da IA</h3>
+                  <p>Prompt pronto ou resultado retornado pelo Flask</p>
+                </div>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>Prompt sugerido</strong>
+                  <button class="ghost-btn" id="copyAiPromptBtn">Copiar</button>
+                </div>
+                <textarea class="textarea output" id="aiPromptOutput" readonly></textarea>
+              </div>
+
+              <div class="output-card">
+                <div class="output-header">
+                  <strong>Resposta</strong>
+                  <button class="ghost-btn" id="copyAiResponseBtn">Copiar</button>
+                </div>
+                <textarea class="textarea output tall" id="aiResponseOutput" readonly></textarea>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!--
+        =======================================================================
+        MÓDULO: REFERÊNCIAS
+        =======================================================================
+        Inclui:
+        - localizador de cidade/sigla
+        - contatos
+        - redes/IDs para gerar regra
+
+        As informações são renderizadas a partir de arrays em script.js.
+        -->
+        <section class="section" id="referencias">
+          <article class="panel reference-search-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Localizador NOC</h3>
+                <p>Pesquise uma cidade ou sigla e encontre rapidamente a padronização usada no NOC.</p>
+              </div>
+              <span class="pill" id="referenceCount">0 localidades</span>
+            </div>
+
+            <div class="reference-search-row">
+              <input class="input" id="referenceSearch" type="search" placeholder="Ex.: Arapiraca, AIR, Igreja Nova, INV...">
+              <button class="secondary-btn" id="clearReferenceSearchBtn">Limpar busca</button>
+            </div>
+
+            <div id="referenceSpotlight" class="reference-spotlight hidden"></div>
+          </article>
+
+          <div class="grid-2">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Siglas e localidades</h3>
+                  <p>Base completa de cidades do material operacional.</p>
+                </div>
+              </div>
+
+              <div class="table-wrap reference-table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Cidade</th><th>Sigla</th><th></th></tr>
+                  </thead>
+                  <tbody id="siglasTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Contatos úteis</h3>
+                  <p>Operadoras e contatos usados no atendimento.</p>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Operadora</th><th>Telefone</th><th>E-mail</th></tr>
+                  </thead>
+                  <tbody id="contactsTable"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+
+          <article class="panel network-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Gerador de regra por rede</h3>
+                <p>Pesquise a cidade/rede, selecione o ID correto e gere somente o comando operacional.</p>
+              </div>
+              <span class="meta-badge">sem credenciais no navegador</span>
+            </div>
+
+            <div class="toolbar-grid network-toolbar">
+              <label>
+                Buscar rede
+                <input class="input" id="networkSearch" type="search" placeholder="Ex.: Penedo, FTTH.35, 57...">
+              </label>
+              <label class="wide">
+                Rede
+                <select class="input" id="networkSelect"></select>
+              </label>
+            </div>
+
+            <div class="network-command-card">
+              <div>
+                <span class="stat-label">Comando gerado</span>
+                <div class="command-snippet" id="networkRulePreview">/bin/gerar3.sh [ID]</div>
+              </div>
+              <button class="primary-btn" id="copyNetworkRuleBtn">Copiar comando</button>
+            </div>
+
+            <div class="table-wrap reference-table-wrap small-table">
+              <table>
+                <thead>
+                  <tr><th>ID</th><th>Rede</th><th>Cidade / Localidade</th></tr>
+                </thead>
+                <tbody id="networkTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!--
+  =============================================================================
+  MODAIS DE PERSONALIZAÇÃO
+  =============================================================================
+  Modal = janela que aparece por cima da página.
+
+  Temos dois:
+  1) appearanceModal -> troca de tema
+  2) profileModal    -> nome, função, ícone ou foto
+
+  O CSS controla a aparência.
+  O JavaScript controla abrir/fechar e salvar as escolhas.
+  -->
+  <div class="modal-backdrop" id="appearanceModal" aria-hidden="true">
+    <div class="modal-card customization-modal" role="dialog" aria-modal="true" aria-labelledby="appearanceTitle">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">PERSONALIZAÇÃO</span>
+          <h3 id="appearanceTitle">Escolha a aparência</h3>
+          <p>O tema fica salvo neste navegador e será restaurado automaticamente.</p>
+        </div>
+        <button class="modal-close" type="button" data-close-modal="appearanceModal" aria-label="Fechar">×</button>
+      </div>
+
+      <div class="theme-grid">
+        <button class="theme-option" type="button" data-theme-choice="oceano">
+          <span class="theme-preview theme-preview-oceano">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>Oceano Noturno</strong>
+            <small>Tema atual • azul escuro</small>
+          </span>
+          <span class="theme-check">✓</span>
+        </button>
+
+        <button class="theme-option" type="button" data-theme-choice="gelo">
+          <span class="theme-preview theme-preview-gelo">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>Gelo</strong>
+            <small>Claro • azul gelo e branco</small>
+          </span>
+          <span class="theme-check">✓</span>
+        </button>
+
+        <button class="theme-option" type="button" data-theme-choice="cafe">
+          <span class="theme-preview theme-preview-cafe">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>Café com Leite</strong>
+            <small>Quente • creme e marrom</small>
+          </span>
+          <span class="theme-check">✓</span>
+        </button>
+
+        <button class="theme-option" type="button" data-theme-choice="rubi">
+          <span class="theme-preview theme-preview-rubi">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>Rubi Escuro</strong>
+            <small>Escuro • vermelho profundo</small>
+          </span>
+          <span class="theme-check">✓</span>
+        </button>
+      </div>
+
+      <div class="modal-footer note-footer">
+        <span>◐</span>
+        <p>Você pode trocar de tema a qualquer momento sem perder notas, favoritos ou modelos.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="profileModal" aria-hidden="true">
+    <div class="modal-card profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">SEU ESPAÇO</span>
+          <h3 id="profileTitle">Personalizar perfil</h3>
+          <p>Escolha um ícone ou use uma imagem sua. Os dados ficam somente neste navegador.</p>
+        </div>
+        <button class="modal-close" type="button" data-close-modal="profileModal" aria-label="Fechar">×</button>
+      </div>
+
+      <div class="profile-editor">
+        <div class="profile-preview-column">
+          <span class="profile-avatar preview" id="profileAvatarPreview">👩‍💻</span>
+          <strong id="profilePreviewName">Operador NOC</strong>
+          <small id="profilePreviewRole">NOC</small>
+
+          <label class="upload-avatar-btn">
+            Escolher imagem
+            <input type="file" id="profileImageInput" accept="image/png,image/jpeg,image/webp" hidden>
+          </label>
+          <button class="ghost-btn compact-btn" id="removeProfileImageBtn" type="button">Usar ícone</button>
+        </div>
+
+        <div class="profile-fields">
+          <label>
+            Nome exibido
+            <input class="input" type="text" id="profileNameInput" maxlength="40" placeholder="Ex.: Andressa">
+          </label>
+
+          <label>
+            Função / descrição
+            <input class="input" type="text" id="profileRoleInput" maxlength="50" placeholder="Ex.: Analista NOC">
+          </label>
+
+          <div class="icon-picker-group">
+            <span class="field-label">Escolha um ícone</span>
+            <div class="icon-picker" id="profileIconPicker">
+              <button type="button" class="avatar-icon-option" data-icon="👩‍💻">👩‍💻</button>
+              <button type="button" class="avatar-icon-option" data-icon="🧑‍💻">🧑‍💻</button>
+              <button type="button" class="avatar-icon-option" data-icon="📡">📡</button>
+              <button type="button" class="avatar-icon-option" data-icon="🌐">🌐</button>
+              <button type="button" class="avatar-icon-option" data-icon="🛰️">🛰️</button>
+              <button type="button" class="avatar-icon-option" data-icon="🛡️">🛡️</button>
+              <button type="button" class="avatar-icon-option" data-icon="⚡">⚡</button>
+              <button type="button" class="avatar-icon-option" data-icon="🔧">🔧</button>
+            </div>
+          </div>
+
+          <div class="profile-tip">
+            <strong>Dica:</strong> uma imagem escolhida aqui é reduzida automaticamente antes de ser salva no navegador.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" type="button" data-close-modal="profileModal">Cancelar</button>
+        <button class="primary-btn" type="button" id="saveProfileBtn">Salvar perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <!--
+  O script fica no final do body de propósito.
+  Assim, o HTML é carregado antes do JavaScript tentar localizar os elementos.
+  -->
+  <script src="script.js"></script>
+</body>
+</html>

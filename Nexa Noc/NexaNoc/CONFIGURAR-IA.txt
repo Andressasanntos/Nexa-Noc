@@ -1,0 +1,37 @@
+NOC FLOW STUDIO - CONFIGURAR IA REAL NO DOCKER
+================================================
+
+O projeto continua funcionando sem chave, usando o assistente local.
+Para o botão "Executar pelo backend" usar IA real:
+
+1. Nesta mesma pasta, copie o arquivo:
+      .env.example
+   e renomeie a cópia para:
+      .env
+
+2. Abra o arquivo .env e altere:
+      OPENAI_API_KEY=cole_sua_chave_aqui
+   pela sua chave da API da OpenAI.
+
+3. Salve o arquivo.
+
+4. Com o Docker Desktop aberto, execute:
+      INICIAR-NOC-FLOW.bat
+
+   Se o container já estiver rodando, o arquivo BAT executa o build novamente.
+
+5. Abra:
+      http://localhost:5000
+
+6. Teste o backend em:
+      http://localhost:5000/api/health
+
+   Com a chave configurada, deverá aparecer:
+      "ai": "openai"
+
+IMPORTANTE
+----------
+- Não coloque a chave no HTML nem no JavaScript.
+- Não compartilhe o arquivo .env.
+- O uso da API da OpenAI é separado da assinatura do ChatGPT e pode gerar cobrança na conta da API.
+- Se a API estiver indisponível ou a chave estiver incorreta, o sistema usa automaticamente o modo local como fallback.

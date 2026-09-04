@@ -1,0 +1,11 @@
+services:
+  noc-flow-studio:
+    build: .
+    container_name: noc-flow-studio
+    ports:
+      - "5000:5000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.6-luna}
+      OPENAI_TIMEOUT: ${OPENAI_TIMEOUT:-45}
+    restart: unless-stopped

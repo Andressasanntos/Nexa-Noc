@@ -1,0 +1,1516 @@
+/*
+===============================================================================
+NOC FLOW STUDIO - GUIA RÁPIDO DO CSS
+===============================================================================
+
+CSS = APARÊNCIA da aplicação.
+
+Conceitos importantes usados aqui:
+
+1) VARIÁVEIS CSS
+   Exemplo:
+       --primary: #4f8cff;
+   Uso:
+       color: var(--primary);
+
+   Vantagem: você troca uma cor em um lugar e vários componentes mudam juntos.
+
+2) GRID
+   Usado para layouts em linhas/colunas.
+   Exemplo:
+       display: grid;
+       grid-template-columns: 280px 1fr;
+
+3) FLEXBOX
+   Usado para alinhar elementos.
+   Exemplo:
+       display: flex;
+       justify-content: space-between;
+
+4) MEDIA QUERIES
+   Regras aplicadas quando a tela fica menor.
+   É isso que deixa o sistema responsivo.
+
+5) TEMAS
+   O JavaScript coloca no elemento <html>:
+       data-theme="gelo"
+   e o CSS seleciona:
+       html[data-theme="gelo"] { ... }
+
+REGRA DE OURO:
+Antes de mudar dezenas de componentes individualmente, veja se existe
+uma variável em :root que já controla aquilo.
+
+===============================================================================
+*/
+
+/* ---------------------------------------------------------------------------
+   1. VARIÁVEIS GLOBAIS / DESIGN TOKENS
+   ---------------------------------------------------------------------------
+   Aqui ficam cores, sombras e raios usados no sistema inteiro.
+   Pense nisso como a "paleta central" do projeto.
+*/
+:root {
+  --bg: #0b1020;
+  --bg-soft: #12182b;
+  --surface: rgba(17, 24, 39, 0.78);
+  --surface-strong: #111827;
+  --surface-lighter: #172033;
+  --line: rgba(148, 163, 184, 0.14);
+  --line-strong: rgba(96, 165, 250, 0.24);
+  --text: #e5edf8;
+  --muted: #9fb0c8;
+  --primary: #4f8cff;
+  --primary-strong: #3b82f6;
+  --secondary: #22c55e;
+  --accent: #06b6d4;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.26);
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Inter", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(79, 140, 255, 0.14), transparent 20%),
+    radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.12), transparent 24%),
+    linear-gradient(180deg, #0a1122, #09101d 58%, #0b1220);
+  color: var(--text);
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  border: none;
+}
+
+/* ---------------------------------------------------------------------------
+   2. ESTRUTURA PRINCIPAL
+   ---------------------------------------------------------------------------
+   A aplicação usa Grid:
+   - coluna 1: sidebar com 280px
+   - coluna 2: restante da tela (1fr)
+*/
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+/* MENU LATERAL --------------------------------------------------------------
+   position: sticky mantém o menu visível durante a rolagem em telas grandes.
+*/
+.sidebar {
+  border-right: 1px solid var(--line);
+  padding: 22px 18px;
+  background: rgba(8, 13, 25, 0.86);
+  backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.brand h1 {
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.brand p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.nav-link {
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: rgba(79, 140, 255, 0.08);
+  border-color: rgba(79, 140, 255, 0.12);
+}
+
+.nav-link.active {
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.18), rgba(6, 182, 212, 0.12));
+  border-color: var(--line-strong);
+  color: white;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 10px;
+}
+
+.content {
+  padding: 28px;
+}
+
+/* BARRA SUPERIOR ------------------------------------------------------------
+   flex permite que título e ações fiquem lado a lado e quebrem de linha
+   quando não houver espaço suficiente.
+*/
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.topbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-global input,
+.input,
+.textarea {
+  width: 100%;
+  background: rgba(10, 16, 31, 0.88);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--text);
+  padding: 12px 14px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.search-global input {
+  min-width: 320px;
+}
+
+.input:focus,
+.textarea:focus,
+.search-global input:focus {
+  border-color: rgba(79, 140, 255, 0.42);
+  box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.10);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.textarea.output {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.textarea.large {
+  min-height: 220px;
+}
+
+.textarea.tall {
+  min-height: 250px;
+}
+
+/* ---------------------------------------------------------------------------
+   3. SISTEMA DE TELAS/SEÇÕES
+   ---------------------------------------------------------------------------
+   Todas começam escondidas. O JavaScript adiciona .active somente na tela
+   selecionada. Isso cria navegação sem recarregar a página.
+*/
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.hero-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(79, 140, 255, 0.14), rgba(17, 24, 39, 0.95));
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.hero-card h3 {
+  margin: 6px 0 10px;
+  font-size: 1.7rem;
+}
+
+.hero-card p {
+  margin: 0;
+  max-width: 700px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.eyebrow {
+  display: inline-block;
+  color: var(--primary);
+  letter-spacing: 0.10em;
+  font-size: 0.77rem;
+  text-transform: uppercase;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* CARDS DO DASHBOARD --------------------------------------------------------
+   repeat(4, 1fr) cria quatro colunas com tamanhos iguais.
+*/
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card, .panel {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.stat-card {
+  padding: 18px;
+}
+
+.stat-card strong {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 1.85rem;
+}
+
+.stat-card .stat-label {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.stat-card small {
+  color: var(--muted);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.panel {
+  padding: 18px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.panel-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pill {
+  background: rgba(34, 197, 94, 0.12);
+  color: #8ef1b0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.77rem;
+  border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+/* FORMULÁRIOS ---------------------------------------------------------------
+   Duas colunas no desktop. Em telas menores a media query muda para uma.
+*/
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-grid.compact {
+  margin-bottom: 18px;
+}
+
+.form-grid label,
+.toolbar-grid label,
+.full-block {
+  display: block;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.form-grid label .input,
+.toolbar-grid label .input,
+.full-block .textarea,
+.full-block .input {
+  margin-top: 8px;
+}
+
+.full-block {
+  margin-bottom: 14px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* BOTÕES --------------------------------------------------------------------
+   Várias classes compartilham a mesma base para evitar repetição de CSS.
+*/
+.primary-btn,
+.secondary-btn,
+.ghost-btn,
+.action-tile {
+  cursor: pointer;
+  transition: 0.18s ease;
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--primary-strong), var(--accent));
+  color: white;
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.28);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.secondary-btn:hover,
+.ghost-btn:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.ghost-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.ghost-btn.full {
+  width: 100%;
+}
+
+.output-card {
+  background: rgba(8, 13, 25, 0.48);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.output-header strong {
+  font-size: 0.95rem;
+}
+
+.output {
+  min-height: 120px;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.action-tile {
+  text-align: left;
+  background: rgba(79, 140, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(79, 140, 255, 0.10);
+}
+
+.action-tile:hover {
+  background: var(--soft-primary-strong);
+}
+
+.mini-callout {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.12);
+  color: #cceef7;
+  line-height: 1.55;
+}
+
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: 180px 220px 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.toolbar-grid .wide {
+  grid-column: auto;
+}
+
+/* LISTAS DINÂMICAS ----------------------------------------------------------
+   O HTML interno dos comandos/modelos é gerado pelo JavaScript.
+   O CSS abaixo define apenas como esses cards devem parecer.
+*/
+.command-list,
+.list-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.command-card,
+.template-card {
+  background: rgba(8, 13, 25, 0.48);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.command-card .top-row,
+.template-card .top-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.command-card h4,
+.template-card h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.command-meta,
+.template-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.meta-badge {
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid var(--line);
+}
+
+.command-card p,
+.template-card p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.command-snippet {
+  background: var(--control-bg);
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  padding: 12px;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--primary);
+  overflow-x: auto;
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+.result-box {
+  margin-bottom: 14px;
+}
+
+.result-box h4 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.chip {
+  background: var(--soft-primary);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  font-size: 0.82rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+td {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.toast {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  background: #111827;
+  color: white;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: 0.22s ease;
+  max-width: 360px;
+  z-index: 40;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4. RESPONSIVIDADE - TABLET / TELAS MÉDIAS
+   ---------------------------------------------------------------------------
+   Quando a tela chega a 1100px ou menos, o layout começa a se reorganizar.
+*/
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stats-grid,
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .toolbar-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .toolbar-grid .wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* RESPONSIVIDADE - CELULAR --------------------------------------------------
+   Uma coluna, botões maiores e menos espaço lateral.
+*/
+@media (max-width: 760px) {
+  .content {
+    padding: 18px;
+  }
+
+  .topbar,
+  .hero-card {
+    align-items: stretch;
+  }
+
+  .search-global input {
+    min-width: 100%;
+  }
+
+  .stats-grid,
+  .grid-2,
+  .form-grid,
+  .toolbar-grid,
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row,
+  .topbar-actions,
+  .hero-actions {
+    width: 100%;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn,
+  .action-tile {
+    width: 100%;
+  }
+
+  .output-header,
+  .panel-header,
+  .top-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   5. REFERÊNCIAS / LOCALIZADOR NOC
+   ---------------------------------------------------------------------------
+   Estilos específicos para busca de cidades, siglas, contatos e redes.
+*/
+.reference-search-panel {
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, var(--soft-primary), var(--surface-strong));
+}
+
+.reference-search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.reference-spotlight {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--soft-primary);
+  border: 1px solid var(--line);
+}
+
+.reference-spotlight strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+}
+
+.reference-spotlight p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.reference-table-wrap {
+  max-height: 520px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.reference-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-strong);
+  z-index: 2;
+}
+
+.reference-table-wrap tbody tr.match-highlight {
+  background: var(--soft-primary);
+}
+
+.copy-mini-btn {
+  padding: 7px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--soft-primary);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.copy-mini-btn:hover {
+  background: var(--soft-primary-strong);
+}
+
+.network-panel {
+  margin-top: 18px;
+}
+
+.network-toolbar {
+  grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+}
+
+.network-command-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+  background: var(--panel-inner);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.network-command-card .command-snippet {
+  margin: 8px 0 0;
+}
+
+.small-table {
+  max-height: 340px;
+}
+
+@media (max-width: 760px) {
+  .reference-search-row,
+  .network-command-card,
+  .network-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   6. TEMAS E PERSONALIZAÇÃO
+   ==========================================================================
+   Esta parte SOBRESCREVE algumas variáveis definidas no início do arquivo.
+
+   Exemplo:
+   html[data-theme="cafe"] muda apenas os valores das variáveis.
+   Os componentes continuam usando var(--primary), var(--surface), etc.
+
+   Isso é muito melhor que duplicar todo o CSS para cada tema.
+   ========================================================================== 
+   ========================================================= */
+
+:root,
+html[data-theme="oceano"] {
+  --page-bg-1: #0a1122;
+  --page-bg-2: #09101d;
+  --page-bg-3: #0b1220;
+  --page-glow-1: rgba(79, 140, 255, 0.14);
+  --page-glow-2: rgba(6, 182, 212, 0.12);
+  --sidebar-bg: rgba(8, 13, 25, 0.86);
+  --control-bg: rgba(10, 16, 31, 0.88);
+  --panel-inner: rgba(8, 13, 25, 0.48);
+  --soft-primary: rgba(79, 140, 255, 0.10);
+  --soft-primary-strong: rgba(79, 140, 255, 0.18);
+  --soft-accent: rgba(6, 182, 212, 0.08);
+  --hero-start: rgba(79, 140, 255, 0.14);
+  --hero-end: rgba(17, 24, 39, 0.95);
+  --on-primary: #ffffff;
+}
+
+html[data-theme="gelo"] {
+  --bg: #eef6fb;
+  --bg-soft: #e4eff6;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #ffffff;
+  --surface-lighter: #edf5fa;
+  --line: rgba(59, 89, 110, 0.15);
+  --line-strong: rgba(71, 133, 171, 0.30);
+  --text: #203646;
+  --muted: #647b8a;
+  --primary: #6aaed6;
+  --primary-strong: #4f98c3;
+  --secondary: #5aa98b;
+  --accent: #7bc9d8;
+  --warning: #c68b35;
+  --danger: #c75d68;
+  --shadow: 0 20px 45px rgba(73, 111, 134, 0.16);
+  --page-bg-1: #f8fcff;
+  --page-bg-2: #edf6fb;
+  --page-bg-3: #e8f2f8;
+  --page-glow-1: rgba(106, 174, 214, 0.22);
+  --page-glow-2: rgba(123, 201, 216, 0.18);
+  --sidebar-bg: rgba(242, 248, 252, 0.90);
+  --control-bg: rgba(255, 255, 255, 0.92);
+  --panel-inner: rgba(238, 247, 251, 0.72);
+  --soft-primary: rgba(79, 152, 195, 0.10);
+  --soft-primary-strong: rgba(79, 152, 195, 0.16);
+  --soft-accent: rgba(123, 201, 216, 0.16);
+  --hero-start: rgba(132, 196, 226, 0.28);
+  --hero-end: rgba(255, 255, 255, 0.88);
+  --on-primary: #ffffff;
+}
+
+html[data-theme="cafe"] {
+  --bg: #efe5d8;
+  --bg-soft: #e4d4c2;
+  --surface: rgba(255, 249, 240, 0.82);
+  --surface-strong: #fff8ee;
+  --surface-lighter: #f5e9db;
+  --line: rgba(92, 64, 48, 0.16);
+  --line-strong: rgba(151, 105, 75, 0.34);
+  --text: #3d2a22;
+  --muted: #7f685b;
+  --primary: #a06f50;
+  --primary-strong: #875b42;
+  --secondary: #7e8c63;
+  --accent: #c28b67;
+  --warning: #b67a2c;
+  --danger: #a44f4f;
+  --shadow: 0 20px 45px rgba(74, 48, 34, 0.15);
+  --page-bg-1: #f7efe5;
+  --page-bg-2: #ecdfcf;
+  --page-bg-3: #e5d5c3;
+  --page-glow-1: rgba(160, 111, 80, 0.18);
+  --page-glow-2: rgba(194, 139, 103, 0.16);
+  --sidebar-bg: rgba(244, 233, 220, 0.92);
+  --control-bg: rgba(255, 250, 242, 0.94);
+  --panel-inner: rgba(243, 231, 216, 0.76);
+  --soft-primary: rgba(160, 111, 80, 0.10);
+  --soft-primary-strong: rgba(160, 111, 80, 0.18);
+  --soft-accent: rgba(194, 139, 103, 0.12);
+  --hero-start: rgba(160, 111, 80, 0.18);
+  --hero-end: rgba(255, 249, 240, 0.92);
+  --on-primary: #fffaf4;
+}
+
+html[data-theme="rubi"] {
+  --bg: #120b10;
+  --bg-soft: #1d1018;
+  --surface: rgba(31, 15, 23, 0.82);
+  --surface-strong: #221018;
+  --surface-lighter: #2b1620;
+  --line: rgba(255, 174, 184, 0.13);
+  --line-strong: rgba(239, 68, 68, 0.30);
+  --text: #f6e8eb;
+  --muted: #c3a0a9;
+  --primary: #ef4444;
+  --primary-strong: #dc2626;
+  --secondary: #c08457;
+  --accent: #fb7185;
+  --warning: #f59e0b;
+  --danger: #fb7185;
+  --shadow: 0 22px 55px rgba(0, 0, 0, 0.36);
+  --page-bg-1: #160a10;
+  --page-bg-2: #0f090d;
+  --page-bg-3: #170a10;
+  --page-glow-1: rgba(239, 68, 68, 0.16);
+  --page-glow-2: rgba(251, 113, 133, 0.10);
+  --sidebar-bg: rgba(14, 8, 12, 0.91);
+  --control-bg: rgba(25, 11, 17, 0.92);
+  --panel-inner: rgba(17, 8, 12, 0.58);
+  --soft-primary: rgba(239, 68, 68, 0.09);
+  --soft-primary-strong: rgba(239, 68, 68, 0.18);
+  --soft-accent: rgba(251, 113, 133, 0.08);
+  --hero-start: rgba(239, 68, 68, 0.13);
+  --hero-end: rgba(31, 15, 23, 0.96);
+  --on-primary: #ffffff;
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at top right, var(--page-glow-1), transparent 20%),
+    radial-gradient(circle at bottom left, var(--page-glow-2), transparent 24%),
+    linear-gradient(180deg, var(--page-bg-1), var(--page-bg-2) 58%, var(--page-bg-3));
+}
+
+.sidebar {
+  background: var(--sidebar-bg);
+}
+
+.search-global input,
+.input,
+.textarea {
+  background: var(--control-bg);
+}
+
+.hero-card {
+  background: linear-gradient(135deg, var(--hero-start), var(--hero-end));
+}
+
+.output-card,
+.command-card,
+.template-card {
+  background: var(--panel-inner);
+}
+
+.nav-link:hover {
+  background: var(--soft-primary);
+  border-color: var(--line);
+}
+
+.nav-link.active {
+  background: linear-gradient(135deg, var(--soft-primary-strong), var(--soft-accent));
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.action-tile {
+  background: var(--soft-primary);
+  border-color: var(--line);
+}
+
+.action-tile:hover {
+  background: var(--soft-primary-strong);
+}
+
+.mini-callout {
+  background: var(--soft-accent);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.primary-btn {
+  color: var(--on-primary);
+}
+
+/* CONTROLES DO TOPO ---------------------------------------------------------
+   Botões de Aparência e Perfil.
+*/
+.topbar-tool-btn,
+.profile-trigger {
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  transition: 0.18s ease;
+}
+
+.topbar-tool-btn:hover,
+.profile-trigger:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+  background: var(--surface-lighter);
+}
+
+.tool-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--soft-primary-strong);
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.profile-trigger {
+  padding-right: 14px;
+}
+
+.profile-trigger-text {
+  display: grid;
+  text-align: left;
+  gap: 2px;
+}
+
+.profile-trigger-text strong {
+  font-size: 0.83rem;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-trigger-text small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-avatar {
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--soft-primary-strong), var(--soft-accent));
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+}
+
+.profile-avatar.small {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  font-size: 1.15rem;
+}
+
+.profile-avatar.preview {
+  width: 104px;
+  height: 104px;
+  border-radius: 28px;
+  font-size: 2.8rem;
+  box-shadow: var(--shadow);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* MODAIS --------------------------------------------------------------------
+   .modal-backdrop cobre a tela.
+   .modal-card é a caixa central.
+   A classe .open é adicionada/removida pelo JavaScript.
+*/
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(3, 7, 18, 0.62);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s ease;
+}
+
+html[data-theme="gelo"] .modal-backdrop,
+html[data-theme="cafe"] .modal-backdrop {
+  background: rgba(35, 47, 55, 0.30);
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  width: min(760px, 100%);
+  max-height: min(86vh, 760px);
+  overflow: auto;
+  border-radius: 24px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-strong);
+  color: var(--text);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+  padding: 22px;
+  transform: translateY(12px) scale(0.985);
+  transition: 0.22s ease;
+}
+
+.modal-backdrop.open .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 5px 0 6px;
+  font-size: 1.3rem;
+}
+
+.modal-header p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.modal-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--surface-lighter);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.theme-option {
+  position: relative;
+  display: grid;
+  grid-template-columns: 70px 1fr 28px;
+  gap: 13px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: 0.18s ease;
+}
+
+.theme-option:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+}
+
+.theme-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--soft-primary);
+}
+
+.theme-option strong,
+.theme-option small {
+  display: block;
+}
+
+.theme-option small {
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+.theme-check {
+  opacity: 0;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+.theme-option.active .theme-check {
+  opacity: 1;
+}
+
+.theme-preview {
+  width: 68px;
+  height: 50px;
+  border-radius: 13px;
+  overflow: hidden;
+  display: flex;
+  padding: 7px;
+  gap: 4px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.13);
+}
+
+.theme-preview i {
+  display: block;
+  border-radius: 5px;
+}
+
+.theme-preview i:nth-child(1) { width: 24%; }
+.theme-preview i:nth-child(2) { width: 48%; }
+.theme-preview i:nth-child(3) { width: 20%; }
+
+.theme-preview-oceano { background: #0b1020; }
+.theme-preview-oceano i:nth-child(1) { background: #172033; }
+.theme-preview-oceano i:nth-child(2) { background: #3b82f6; }
+.theme-preview-oceano i:nth-child(3) { background: #06b6d4; }
+
+.theme-preview-gelo { background: #eef6fb; }
+.theme-preview-gelo i:nth-child(1) { background: #d9eaf4; }
+.theme-preview-gelo i:nth-child(2) { background: #6aaed6; }
+.theme-preview-gelo i:nth-child(3) { background: #ffffff; }
+
+.theme-preview-cafe { background: #efe5d8; }
+.theme-preview-cafe i:nth-child(1) { background: #dcc4ad; }
+.theme-preview-cafe i:nth-child(2) { background: #a06f50; }
+.theme-preview-cafe i:nth-child(3) { background: #fff8ee; }
+
+.theme-preview-rubi { background: #120b10; }
+.theme-preview-rubi i:nth-child(1) { background: #2b1620; }
+.theme-preview-rubi i:nth-child(2) { background: #dc2626; }
+.theme-preview-rubi i:nth-child(3) { background: #fb7185; }
+
+.note-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.note-footer p {
+  margin: 0;
+}
+
+/* PERFIL --------------------------------------------------------------------
+   Estilos para pré-visualização, upload de foto e seleção de ícones.
+*/
+.profile-editor {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 26px;
+}
+
+.profile-preview-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--panel-inner);
+  border: 1px solid var(--line);
+}
+
+.profile-preview-column > strong {
+  margin-top: 7px;
+  text-align: center;
+}
+
+.profile-preview-column > small {
+  color: var(--muted);
+  text-align: center;
+}
+
+.upload-avatar-btn {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--soft-primary-strong);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.compact-btn {
+  width: 100%;
+  padding: 9px 10px;
+}
+
+.profile-fields {
+  display: grid;
+  gap: 15px;
+}
+
+.profile-fields label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.profile-fields label .input {
+  margin-top: 7px;
+}
+
+.field-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(38px, 1fr));
+  gap: 8px;
+}
+
+.avatar-icon-option {
+  aspect-ratio: 1;
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--surface-lighter);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.35rem;
+  transition: 0.15s ease;
+}
+
+.avatar-icon-option:hover,
+.avatar-icon-option.active {
+  border-color: var(--primary);
+  background: var(--soft-primary-strong);
+  transform: translateY(-1px);
+}
+
+.profile-tip {
+  padding: 12px 13px;
+  border-radius: 14px;
+  background: var(--soft-accent);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 0.84rem;
+}
+
+.profile-tip strong {
+  color: var(--text);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 820px) {
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-preview-column {
+    max-width: 300px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .icon-picker {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+  }
+
+  .profile-trigger-text {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .topbar-tool-btn,
+  .profile-trigger {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .topbar-tool-btn span:last-child {
+    display: none;
+  }
+
+  .modal-card {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .theme-option {
+    grid-template-columns: 60px 1fr 26px;
+  }
+
+  .theme-preview {
+    width: 58px;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+

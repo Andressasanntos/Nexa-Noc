@@ -1,0 +1,18 @@
+NOC FLOW STUDIO - COMO USAR COM DOCKER
+
+1. Instale o Docker Desktop no Windows, caso ainda nao tenha.
+2. Abra o Docker Desktop e aguarde ele ficar pronto.
+3. Dê dois cliques em INICIAR-NOC-FLOW.bat.
+4. O container sera criado/iniciado e o navegador abrira automaticamente em:
+   http://localhost:5000
+
+Para parar o sistema:
+- Dê dois cliques em PARAR-NOC-FLOW.bat
+
+Comandos equivalentes pelo terminal:
+- Iniciar/criar: docker compose up -d --build
+- Parar/remover container: docker compose down
+- Ver logs: docker compose logs -f
+
+Observacao:
+O codigo original da aplicacao nao foi alterado. Foram adicionados somente arquivos para execucao em Docker e os atalhos .bat.
